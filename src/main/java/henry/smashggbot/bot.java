@@ -30,6 +30,8 @@ public class bot implements EventListener {
         HttpClient httpClient = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost("https://api.smash.gg/gql/alpha");
 
+        System.out.println("BLAH BLAH BLAH");
+
         // Request parameters and other properties
         List<NameValuePair> params = new ArrayList<NameValuePair>(2);
         params.add(new BasicNameValuePair("query", ""));
