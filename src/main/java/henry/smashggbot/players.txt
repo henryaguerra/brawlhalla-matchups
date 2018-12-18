@@ -22,7 +22,7 @@
 67047	Pugsyxd
 270135	Midget
 363319	Webbster
-270211	Velo_citY|Brian(brian)
+270211	Velo_citY|Brian
 274409	Parallel
 136612	Tybo
 618488	Stupor
@@ -102,7 +102,23 @@
 616315	Neeze
 270381	KylarAlice
 278738	Tiger
+263975	MotherRussia
+136610	Marshall.D.Haki
 671829	reaper
+313217	catnip
+152733	Baboute
+264286	1cePingu
+260230	Daze
+263547	Astronaut
+134882	Doppey
+271285	Cyclist
+263839	Stimpy
+264315	mantrach
+265948	Hexeract
+268149	Moises
+276507	Betonic
+419277	StenoWorld
+278692	Penguinmang
 136606	meagerpenguin3
 36177	Neos
 34781	Cardd
@@ -226,7 +242,6 @@
 134943	Nightfyre4
 134953	3F
 5528	C3PO
-134882	Doppey
 29394	Dae
 135018	CynicalCyril
 137342	Bluedude
@@ -575,7 +590,6 @@
 152736	cw
 152708	TechStomper
 152739	MiniVessen
-152733	Baboute
 152769	xGud
 46282	RussleSteel
 152767	LeCapitaine
@@ -692,7 +706,6 @@
 269282	Mani-u
 958657	lynX
 965997	MidgetOfFury
-260230	Daze
 958656	lynX
 912564	SigKun
 282499	skif
@@ -934,7 +947,6 @@
 281100	TRPhoenix
 352948	Moose
 342826	Izaeru
-263547	Astronaut
 264306	Limab333n
 241490	Subpar
 275745	Antipop
@@ -945,7 +957,6 @@
 269061	TNL
 268501	Purgatory
 322459	Jankyy
-264315	mantrach
 342652	Vhappy
 352881	ad011a
 278785	UGotFrohned
@@ -1291,7 +1302,6 @@
 352053	ian24snipe
 281703	PhoenixPhantom
 367701	NtyLife
-265948	Hexeract
 347791	Frostywaffle
 362881	xStrikeZZX
 364050	ocoxp9
@@ -1490,7 +1500,6 @@
 349403	P!3P!N3@PPL3
 353149	Fuferman777
 270939	XuKhan
-268149	Moises
 359889	Teagann
 360468	xxxtentacion
 319819	(R.I.P)Kirito
@@ -2292,7 +2301,6 @@
 363971	DeadboyReborn
 342578	FiRoJeRi
 319346	FallenDero
-313217	catnip
 362366	UAT|DeimonNoire
 363819	subsonicmammal
 274902	cheeseturds
@@ -3453,7 +3461,6 @@
 357576	ADL
 341880	FrostHeart
 367722	SoulGreywolf
-264286	1cePingu
 351814	YonatAbait
 348921	LordVAS
 364560	WaLiente
@@ -4254,7 +4261,6 @@
 367402	ImERIC
 352112	Bluub
 349659	_SHDV_
-136610	Marshall.D.Haki
 345451	SplitThorYT/FR
 362620	Sheender
 352017	Zedd
@@ -5820,7 +5826,6 @@
 356836	NeXuS
 291921	HanZh
 356929	YoshiPvP2003
-263839	Stimpy
 343107	Thibbs
 263367	q4r
 269955	Janx
@@ -6227,7 +6232,6 @@
 278663	bobhenderson91
 356706	Ally
 343459	ieyeie
-271285	Cyclist
 368410	Tanarus
 278654	Echo
 315449	Umbra_Star
@@ -10103,7 +10107,6 @@
 374410	FightersDestiny
 3257	ORLY
 215175	YLTCole
-263975	MotherRussia
 19527	Pookie
 263071	Dango
 260611	BigOlKeith
@@ -13187,7 +13190,6 @@
 417789	Chill
 922751	GimpGod
 268625	Sand_Wic
-419277	StenoWorld
 942032	Exodus
 417582	Fayy
 414094	Robin0_0hood
@@ -17301,7 +17303,6 @@
 433883	RR|Supreme
 430126	ChrisG55
 432828	Jellypickles
-276507	Betonic
 274474	Zorruga
 363068	LokiOtaku27
 430484	Takachi14
@@ -20905,7 +20906,6 @@
 490206	GODARK
 490526	dankhaze
 490567	TagTazz
-278692	Penguinmang
 490679	EvilAvatar
 490221	SurrealWinter
 263258	Nitromancer
