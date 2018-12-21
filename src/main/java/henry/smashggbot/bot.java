@@ -17,7 +17,6 @@ import java.awt.*;
 import java.io.*;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
-
 import org.json.*;
 
 
@@ -47,8 +46,7 @@ class MessageListener extends ListenerAdapter{
 
         // Path to player file
         // TODO: Read path from file
-        String path = "C:\\Users\\Henry\\Documents\\GitHub\\smashgg-bot\\" +
-                        "src\\main\\java\\henry\\smashggbot\\players.txt";
+        String path = ".\\players.txt";
 
         //Get message string and channel
         Message message = event.getMessage();
@@ -148,18 +146,6 @@ class MessageListener extends ListenerAdapter{
             embed.setColor(Color.green);
             channel.sendMessage(embed.build()).queue();
         }
-
-        // Embed testing
-        else if(message.toString().contains(prefix + "testembed")) {
-            // Test discord embed
-            EmbedBuilder embed = new EmbedBuilder();
-            embed.setTitle("Matchups for player");
-            embed.setColor(Color.blue);
-            embed.setDescription("ithrow sucks");
-            embed.addField("Title of field", "test of field", true);
-            embed.setAuthor("Matchups bot");
-            channel.sendMessage(embed.build()).queue();
-        }
     }
 
     private static void postRequest(int player1, int player2, MessageChannel channel, boolean ones,
@@ -169,10 +155,12 @@ class MessageListener extends ListenerAdapter{
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost("https://api.smash.gg/gql/alpha");
 
-        String json = String.format("{\"query\":\"query setsByPlayer($playerId: Int!, $oppPlayerId: Int!) {\\n  player(id: $playerId)" +
-                " {\\n    id\\n    gamerTag\\n    recentSets(opponentId: $oppPlayerId){\\n      id\\n      " +
-                "phaseGroupId\\n      event{\\n        name\\n        tournament{\\n          name\\n        }\\n      " +
-                "}\\n      displayScore\\n    }\\n  }\\n}\",\"variables\":{\"playerId\":%d,\"oppPlayerId\":%d}," +
+        String json = String.format("{\"query\":\"query setsByPlayer($playerId: Int!, $oppPlayerId: Int!) " +
+                "{\\n  player(id: $playerId) {\\n    id\\n    gamerTag\\n    recentSets(opponentId: $oppPlayerId)" +
+                "{\\n      id\\n      phaseGroupId\\n      winnerId\\n      event{\\n        name\\n        " +
+                "tournament{\\n          name\\n        }\\n      }\\n      slots{\\n        entrant{\\n          " +
+                "id\\n          participants{\\n            playerId\\n          }\\n        }\\n      }\\n      " +
+                "displayScore\\n    }\\n  }\\n}\",\"variables\":{\"playerId\":%d,\"oppPlayerId\":%d}," +
                 "\"operationName\":\"setsByPlayer\"}", player1, player2);
 
         // Set entity to json string we created and try for unsupported coding exception
@@ -185,7 +173,7 @@ class MessageListener extends ListenerAdapter{
             // Execute post request and catch io exception
             try {
                 CloseableHttpResponse response = client.execute(httpPost);
-                System.out.println(entity.getContent());
+                //System.out.println(entity.getContent());
 
                 BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 
@@ -195,8 +183,8 @@ class MessageListener extends ListenerAdapter{
                     content.append(line);
                 }
 
-                System.out.println(content);
-                parseMatches(content, channel, ones, player1name, player2name);
+                //System.out.println(content);
+                parseMatches(content, channel, ones, player1name, player2name, player1, player2);
 
                 client.close();
             }
@@ -210,7 +198,8 @@ class MessageListener extends ListenerAdapter{
     }
 
     private static void parseMatches(StringBuffer s, MessageChannel channel, boolean ones,
-                                      String player1name, String player2name){
+                                     String player1name, String player2name, int player1ID,
+                                     int player2ID){
 
         // Initialize JSON object and declare JSON array that holds sets
         JSONObject object = new JSONObject(s.toString());
@@ -224,7 +213,7 @@ class MessageListener extends ListenerAdapter{
             System.err.println("Error: " + e.toString());
             channel.sendMessage("A set between these two players does not exist. " +
                     "If you think this is an error, message me on discord: Mother Russia #3907 with" +
-                    "the 2 player's names").queue();
+                    " the 2 player's names").queue();
             return;
         }
 
@@ -237,7 +226,7 @@ class MessageListener extends ListenerAdapter{
         int setsWonBy1 = 0, setsWonBy2 = 0;
 
         // Iterate through set JSON object and display correct score
-        for (int i = 0, j = 1; i < sets.length(); i++){
+        for (int i = 0; i < sets.length(); i++){
 
             // If ones then do ones matchups
             if(ones) {
@@ -250,17 +239,21 @@ class MessageListener extends ListenerAdapter{
 
                 // Print all 2s scores
                 else if (!(sets.getJSONObject(i).getString("displayScore")).contains("/")) {
-                    System.out.println(sets.getJSONObject(i).getString("displayScore"));
+                    //System.out.println(sets.getJSONObject(i).getString("displayScore"));
                     String messageToSend = sets.getJSONObject(i).getString("displayScore");
 
+                    // Parse winnerID to call getwinner
+                    int winnerID = sets.getJSONObject(i).getInt("winnerId");
+
                     // Get win or loss
-                    int winner = winner(messageToSend, player1name, player2name);
+                    int winner = getWinner(sets.getJSONObject(i).getJSONArray("slots"), winnerID,
+                                            player1ID, player2ID);
 
                     // Increment the number of sets won by the player
-                    if(winner == 1){
+                    if(winner == player1ID){
                         setsWonBy1++;
                     }
-                    else if (winner == 2){
+                    else if (winner == player2ID){
                         setsWonBy2++;
                     }
                     else {
@@ -270,25 +263,28 @@ class MessageListener extends ListenerAdapter{
                     //channel.sendMessage(messageToSend).queue();
                     embed.addField(sets.getJSONObject(i).getJSONObject("event").
                             getJSONObject("tournament").getString("name"), messageToSend, false);
-                    j++;
                 }
             }
 
             // If ones is false then do twos parse
             else{
                 if ((sets.getJSONObject(i).getString("displayScore")).contains("/")) {
-                    System.out.println(sets.getJSONObject(i).getString("displayScore"));
+                    //System.out.println(sets.getJSONObject(i).getString("displayScore"));
 
                     String messageToSend = sets.getJSONObject(i).getString("displayScore");
 
+                    // Parse winnerID to call getwinner
+                    int winnerID = sets.getJSONObject(i).getInt("winnerId");
+
                     // Get win or loss
-                    int winner = winner(messageToSend, player1name, player2name);
+                    int winner = getWinner(sets.getJSONObject(i).getJSONArray("slots"), winnerID,
+                                            player1ID, player2ID);
 
                     // Increment the number of sets won by the player
-                    if(winner == 1){
+                    if(winner == player1ID){
                         setsWonBy1++;
                     }
-                    else if (winner == 2){
+                    else if (winner == player2ID){
                         setsWonBy2++;
                     }
                     else {
@@ -297,7 +293,6 @@ class MessageListener extends ListenerAdapter{
                     //channel.sendMessage(messageToSend).queue();
                     embed.addField(sets.getJSONObject(i).getJSONObject("event").
                             getJSONObject("tournament").getString("name"), messageToSend, false);
-                    j++;
                 }
             }
         }
@@ -315,108 +310,44 @@ class MessageListener extends ListenerAdapter{
             fieldTitle.append(" in 2s");
         }
 
+        // Total set count for player1 and player2 in [gamemode], description is set count
+        embed.addField(fieldTitle.toString(), fieldDescription, false);
 
-        embed.addField(fieldTitle.toString(),fieldDescription, false);
-
-        // Queue up embed message
+        // Queue up embed message and make sure there is 1s delay for api call
         channel.sendMessage(embed.build()).completeAfter(1, TimeUnit.SECONDS);
     }
 
     /* Returns an int representing if player1 or player2 won the match, returns -1 if it could not
     *  find a winner */
-    private static int winner(String set, String player1, String player2) {
+    private static int getWinner(JSONArray slots, int winnerID, int player1ID, int player2ID) {
 
-        String split[] = set.split("-");
-        int set1 = 0, set2 = 0;
-        int winner;
-        boolean setHasNumbers = false;
+        //Iterates through the slots array
+        for(int i = 0; i < slots.length(); i++){
 
-        //char leftStringChars[] = split[0].toCharArray();
-        //char rightStringChars[] = split[1].toCharArray();
+            JSONArray participants = slots.getJSONObject(i).getJSONObject("entrant").
+                                        getJSONArray("participants");
 
-        // Check if last character is digit, if not then check 2nd to last digit
-        // This will get the games won for the left side
-        if (Character.isDigit(split[0].charAt(split[0].length() - 1))){
-            set1 = split[0].charAt(split[0].length() - 1);
-            setHasNumbers = true;
-        } else if (Character.isDigit(split[0].charAt(split[0].length() - 2))) {
-            set1 = split[0].charAt(split[0].length() - 2);
-            setHasNumbers = true;
-        } else if (split[0].charAt(split[0].length() - 1) == 'W') {
-            winner = 1;
-            setHasNumbers = false;
-        }
+            //Iterates through the participants array
+            for(int j = 0; j < participants.length(); j++){
+                //System.out.println(participants.length());
+                int id = participants.getJSONObject(j).getInt("playerId");
 
-        // Check if last character is digit, if not then check 2nd to last digit
-        // This will get the games won for the right side
-        if (Character.isDigit(split[1].charAt(split[1].length() - 1))) {
-            set2 = split[1].charAt(split[1].length() - 1);
-            setHasNumbers = true;
-        } else if (Character.isDigit(split[1].charAt(split[1].length() - 2))) {
-            set2 = split[1].charAt(split[1].length() - 2);
-            setHasNumbers = true;
-        } else if (split[1].charAt(split[1].length() - 1) == 'W') {
-            winner = 2;
-            setHasNumbers = false;
-        }
-
-        // If set has numbers then
-        if (setHasNumbers) {
-
-            // set the winner int value
-            if (set1 > set2) {
-                winner = 1;
-            } else {
-                winner = 2;
-            }
-
-            // Check if winner side of string contains player1, if it does set as winner and return
-            if(split[winner - 1].toLowerCase().contains(player1.toLowerCase())){
-                /* if winner = 1, it checks the 0th index string, and checks if
-                * it has player1 string */
-                return 1;
-            }
-
-            // Check if winner side contains player2, if it does set as winner and return
-            else if (split[winner - 1].toLowerCase().contains(player2.toLowerCase())){
-                return 2;
-            }
-
-            // If the string of player1 or 2 is not in winner string, check if one is in the other
-            else if (winner == 1){
-
-                if(split[1].contains(player2)){
-                    // Player 1 wins if player2 is in loser string
-                    return 1;
-                }
-                else if(split[1].contains(player1)){
-                    // Player2 wins if player1 is in loser string
-                    return 2;
-                }
-                // Couldn't find winner
-                else {
-                    return -1;
+                // If id is equal to player1ID, get winner and check if same as winnerID
+                if(id == player1ID) {
+                    if (slots.getJSONObject(i).getJSONObject("entrant").getInt("id") == winnerID){
+                        return player1ID;
+                    }
                 }
 
-            }
-
-            else if (winner == 2){
-
-                if(split[0].contains(player2)){
-                    // Player 1 wins if player2 is in loser string
-                    return 1;
+                // If id is equal to player2ID, get winner and check if same as winnerID
+                else if(id == player2ID) {
+                    if (slots.getJSONObject(i).getJSONObject("entrant").getInt("id") == winnerID){
+                        return player2ID;
+                    }
                 }
-                else if(split[0].contains(player1)){
-                    // Player2 wins if player1 is in loser string
-                    return 2;
-                }
-                // Couldn't find winner
-                else {
-                    return -1;
-                }
-
             }
         }
+
         return -1;
     }
 }
