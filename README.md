@@ -1,4 +1,4 @@
-# smashgg-bot
+# Brawlhalla Matchups Bot
 
 Grabs data from the smashgg api and uses it to search for head to head matchups in the video game brawlhalla
 
