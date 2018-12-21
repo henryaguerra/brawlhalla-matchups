@@ -19,14 +19,13 @@ import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import org.json.*;
 
-
 public class bot {
 
     public static void main(String[] args)
             throws LoginException, InterruptedException
     {
 
-        JDA jda = new JDABuilder("NDI3OTExNjUyMzQwNTMxMjAw.DvZbTA.FyrIgFr4G5fxQvmGlRdE9Ba7O0E")
+        JDA jda = new JDABuilder("YOUR TOKEN HERE")
                 .addEventListener(new MessageListener()).build();
 
         jda.awaitReady();
@@ -46,7 +45,7 @@ class MessageListener extends ListenerAdapter{
 
         // Path to player file
         // TODO: Read path from file
-        String path = ".\\players.txt";
+        String path = "PATH TO PLAYERS.TXT HERE";
 
         //Get message string and channel
         Message message = event.getMessage();
@@ -148,6 +147,7 @@ class MessageListener extends ListenerAdapter{
         }
     }
 
+    /* Makes the POST request to the smashgg api */
     private static void postRequest(int player1, int player2, MessageChannel channel, boolean ones,
                                     String player1name, String player2name){
 
@@ -168,7 +168,7 @@ class MessageListener extends ListenerAdapter{
             StringEntity entity = new StringEntity(json);
             httpPost.setEntity(entity);
             httpPost.setHeader("Content-type", "application/json");
-            httpPost.setHeader("Authorization", "Bearer 0343f613f034d647e9ddc29b24287323");
+            httpPost.setHeader("Authorization", "Bearer SMASHGG TOKEN HERE");
 
             // Execute post request and catch io exception
             try {
@@ -178,12 +178,12 @@ class MessageListener extends ListenerAdapter{
                 BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 
                 StringBuffer content = new StringBuffer();
-                String line = "";
+                String line;
                 while ((line = rd.readLine()) != null) {
                     content.append(line);
                 }
 
-                //System.out.println(content);
+                //Parses the match displayScore and then queues the message up
                 parseMatches(content, channel, ones, player1name, player2name, player1, player2);
 
                 client.close();
@@ -348,6 +348,7 @@ class MessageListener extends ListenerAdapter{
             }
         }
 
+        // If failure to find winner, return -1
         return -1;
     }
 }
