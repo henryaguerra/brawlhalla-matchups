@@ -21,11 +21,27 @@ import org.json.*;
 
 public class bot {
 
+    public static String discordToken;
+    public static String smashGGToken;
+
     public static void main(String[] args)
             throws LoginException, InterruptedException
     {
 
-        JDA jda = new JDABuilder("YOUR TOKEN HERE")
+
+        try {
+            // Scan file for player IDs
+            File file = new File(System.getProperty("user.dir") + "/secrets.txt");
+            Scanner scanner = new Scanner(file);
+            discordToken = scanner.nextLine();
+            smashGGToken = scanner.nextLine();
+        }
+        catch (FileNotFoundException e) {
+            System.err.println("Error: " + e);
+            return;
+        }
+
+        JDA jda = new JDABuilder(bot.discordToken)
                 .addEventListener(new MessageListener()).build();
 
         jda.awaitReady();
@@ -33,7 +49,7 @@ public class bot {
 }
 
 /* Listens for message */
-class MessageListener extends ListenerAdapter{
+class MessageListener extends ListenerAdapter {
     private String prefix = ">";
 
     @Override
@@ -42,10 +58,6 @@ class MessageListener extends ListenerAdapter{
         // Integers used for player IDs and foundID used for knowing when 2 IDs have been foound in file
         int player1 = 0, player2 = 0;
         int foundID = 0;
-
-        // Path to player file
-        // TODO: Read path from file
-        String path = "PATH TO PLAYERS.TXT HERE";
 
         //Get message string and channel
         Message message = event.getMessage();
@@ -78,7 +90,7 @@ class MessageListener extends ListenerAdapter{
             try {
 
                 // Scan file for player IDs
-                File file = new File(path);
+                File file = new File(System.getProperty("user.dir") + "/players.txt");
                 Scanner scanner = new Scanner(file);
                 while (scanner.hasNextLine()){
                     String lineFromFile = scanner.nextLine();
@@ -115,9 +127,6 @@ class MessageListener extends ListenerAdapter{
             // Return if file is not found
             catch (FileNotFoundException e){
                 System.err.println("Error: " + e);
-                System.err.println("Error: " + e);
-                System.err.println("Error: " + e);
-                System.err.println("Error: " + e);
                 return;
             }
 
@@ -140,7 +149,7 @@ class MessageListener extends ListenerAdapter{
             embed.setAuthor("Commands for Brawlhalla Matchup Bot");
             embed.addField("Usage: >[command]   [player1]   [player2]", "No spaces in names", false);
             embed.addField("Commands", "`matches2`" +
-                    " \n`matches1` \n`Add 'L' at the end of command alias to show more tournament info`",
+                            " \n`matches1` \n`Add 'L' at the end of command alias to show more tournament info`",
                     false);
             embed.setColor(Color.green);
             channel.sendMessage(embed.build()).queue();
@@ -168,7 +177,7 @@ class MessageListener extends ListenerAdapter{
             StringEntity entity = new StringEntity(json);
             httpPost.setEntity(entity);
             httpPost.setHeader("Content-type", "application/json");
-            httpPost.setHeader("Authorization", "Bearer SMASHGG TOKEN HERE");
+            httpPost.setHeader("Authorization", "Bearer " + bot.smashGGToken);
 
             // Execute post request and catch io exception
             try {
@@ -247,7 +256,7 @@ class MessageListener extends ListenerAdapter{
 
                     // Get win or loss
                     int winner = getWinner(sets.getJSONObject(i).getJSONArray("slots"), winnerID,
-                                            player1ID, player2ID);
+                                           player1ID, player2ID);
 
                     // Increment the number of sets won by the player
                     if(winner == player1ID){
@@ -278,7 +287,7 @@ class MessageListener extends ListenerAdapter{
 
                     // Get win or loss
                     int winner = getWinner(sets.getJSONObject(i).getJSONArray("slots"), winnerID,
-                                            player1ID, player2ID);
+                                           player1ID, player2ID);
 
                     // Increment the number of sets won by the player
                     if(winner == player1ID){
@@ -318,14 +327,15 @@ class MessageListener extends ListenerAdapter{
     }
 
     /* Returns an int representing if player1 or player2 won the match, returns -1 if it could not
-    *  find a winner */
+     * find a winner */
     private static int getWinner(JSONArray slots, int winnerID, int player1ID, int player2ID) {
 
         //Iterates through the slots array
         for(int i = 0; i < slots.length(); i++){
 
-            JSONArray participants = slots.getJSONObject(i).getJSONObject("entrant").
-                                        getJSONArray("participants");
+            JSONArray participants = slots.getJSONObject(i)
+                                          .getJSONObject("entrant")
+                                          .getJSONArray("participants");
 
             //Iterates through the participants array
             for(int j = 0; j < participants.length(); j++){
