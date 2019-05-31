@@ -164,7 +164,7 @@ class MessageListener extends ListenerAdapter {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost("https://api.smash.gg/gql/alpha");
 
-        String json = String.format("{\"query\":\"query setsByPlayer($playerId: Int!, $oppPlayerId: Int!) " +
+        String json = String.format("{\"query\":\"query setsByPlayer($playerId: ID!, $oppPlayerId: ID!) " +
                 "{\\n  player(id: $playerId) {\\n    id\\n    gamerTag\\n    recentSets(opponentId: $oppPlayerId)" +
                 "{\\n      id\\n      phaseGroupId\\n      winnerId\\n      event{\\n        name\\n        " +
                 "tournament{\\n          name\\n        }\\n      }\\n      slots{\\n        entrant{\\n          " +
